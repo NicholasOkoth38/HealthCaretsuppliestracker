@@ -3,10 +3,12 @@ from rest_framework import generics,status
 from rest_framework_simplejwt.state import User
 from . serializers import RegisterSerializer
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, Token
 from .utils import Mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+import jwt
+from django.conf import settings
 
 # Create your views here.
 class RegisterView(generics.GenericAPIView):
@@ -25,13 +27,29 @@ class RegisterView(generics.GenericAPIView):
         relativeLink=reverse('verify-email')
         
         absurl='http://'+current_site+relativeLink+"?token="+str(token)
-        email_body='Hi'+user.name+'use the link below to verify your email.\n'+absurl
+        email_body='Hi '+user.name+' use the link below to verify your email.\n'+absurl
 
         data={'email_body':email_body, 'to_email':user.email, 'email_subject': 'verify your email'}
         Mail.send_email(data)
         return Response(user_data, status=status.HTTP_201_CREATED )
 
 class verifyEmail(generics.GenericAPIView):
-    def get(self):
-        pass
+    def get(self, request):
+        token=request.GET.get('token')
+        try:
+            activation=jwt.decode(token, settings.SECRET_KEY )
+            user=User.objects.get(id=activation['user_id'])
+
+            if not user.is_verified:
+                user.is_verified=True
+                user.save()
+
+            return Response({'email':'Your account has been activated successfully!!!'}, status=status.HTTP_200_OK )
+
+        except jwt.ExpiredSignatureError:
+            return Response({'error':'Your activation link has already expired.'}, status=status.HTTP_400_BAD_REQUEST)
+        except jwt.exceptions.DecodeError :
+            return Response({'error':'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
     
