@@ -27,6 +27,10 @@ class UserManager(BaseUserManager):
             raise TypeError('This field should not be none.')
         if email is None:
             raise TypeError('Users should have an email.')
+        if location is None:
+            raise TypeError('Users should have a location.')
+        if phone_number is None:
+            raise TypeError('Users should have phone_number.')
         
         user=self.create_user(name,phone_number, location, email, )
         user.is_superuser=True
