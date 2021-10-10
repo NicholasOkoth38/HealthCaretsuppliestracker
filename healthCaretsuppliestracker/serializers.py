@@ -1,5 +1,8 @@
+from django.contrib import auth
 from django.db.models import fields
 from rest_framework import serializers
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.fields import ReadOnlyField
 from .models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -20,3 +23,39 @@ class RegisterSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
+
+class LoginSerializer(serializers.ModelSerializer):
+    password=serializers.CharField(max_length=50, min_length=8, write_only=True)
+    email=serializers.EmailField(max_length=60, min_length=5)
+    name=serializers.CharField(max_length=30, min_length=3, read_only=True)
+
+    tokens=serializers.SerializerMethodField()
+
+    def get_tokens(self, obj):
+        user=User.objects.get(email=obj['email'])
+
+        return {
+            'access_key':user.tokens()['access']
+
+        }
+        
+    class Meta:
+        model=User
+        fields=['email', 'password', 'name', 'tokens']
+
+    def validate(self, attrs):
+        email=attrs.get('email','')
+        password=attrs.get('password','')
+        user=auth.authenticate(email=email, password=password)
+        if not user:
+            raise AuthenticationFailed('Invalid credentials')
+        if not user.is_active:
+            raise AuthenticationFailed('Account disabled')
+
+        return {
+            'email':user.email,
+            'name':user.name,
+            'tokens':user.tokens,
+
+        }
+
