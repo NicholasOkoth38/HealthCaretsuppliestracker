@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from datetime import timedelta
 import os
 from pathlib import Path
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'healthCaretsuppliestracker',
     'rest_framework',
+    'drf_yasg',
+
 ]
 
 MIDDLEWARE = [
@@ -78,6 +82,11 @@ REST_FRAMEWORK = {
     )
   
 }
+
+SIMPLE_JWT={
+    "ACCESS_TOKEN_LIFETIME":datetime.timedelta(minutes=10)
+}
+
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
