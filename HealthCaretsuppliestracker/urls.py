@@ -24,7 +24,6 @@ schema_view = get_schema_view(
       title="Django Authentication system",
       default_version='v1',
       description="Test description",
-      terms_of_service="https://www.healthCaretsuppliestracker.com/policies/terms/",
       contact=openapi.Contact(email="nixonkipkorir01@gmail.local"),
       license=openapi.License(name="DJANGO License"),
    ),
