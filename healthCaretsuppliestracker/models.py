@@ -26,4 +26,4 @@ class Item(models.Model):
     description=models.TextField(max_length=255, default='no data')
     order_status=models.ForeignKey(Status, max_length=10, default='no status', on_delete=models.CASCADE)
     donor=models.ForeignKey(Donor, max_length=10, default=1, on_delete=models.CASCADE)
-    hospital=models.ForeignKey(Hospital, max_length=10, default=1, on_delete=models.CASCADE)
+    hospital=models.ForeignKey(Hospital, max_length=10, default=0, on_delete=models.CASCADE)

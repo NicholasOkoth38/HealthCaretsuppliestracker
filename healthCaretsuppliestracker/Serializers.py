@@ -15,7 +15,12 @@ class StatuSerializer(serializers.ModelSerializer):
     class Meta:
         model=Status
         fields=['status']
-
+#####
+class DonorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Donor
+        fields = ('id', 'name', 'description', 'price')
+###
     def validate(self, attrs):
         status=attrs.get('status', '')
 
